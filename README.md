@@ -139,17 +139,17 @@
             transform: translate(-50%, -50%) scale(1.5);
         }
 
-        /* Caixa da mensagem centralizada corrigida */
+        /* Caixa da mensagem com largura idêntica à referência */
         .mensagem-container {
             position: absolute;
-            width: 88%;
-            max-width: 500px;
-            height: 62vh; /* Altura controlada para caber na tela do celular */
+            width: 90%;
+            max-width: 460px;
+            height: 68vh; 
             overflow-y: auto;
             background: rgba(255, 255, 255, 0.18);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 25px 20px;
+            padding: 30px 24px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
@@ -159,7 +159,7 @@
             transform: translateY(30px) scale(0.95);
             pointer-events: none;
             transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
-            margin-top: 70px;
+            margin-top: 75px;
         }
 
         .mensagem-container.mostrar {
@@ -184,9 +184,9 @@
 
         .mensagem-container p {
             font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 14px;
-            word-wrap: break-word; /* Garante que as palavras quebrem direito */
+            line-height: 1.6;
+            margin-bottom: 16px;
+            word-wrap: break-word; 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
         }
         .mensagem-container p:last-child {
@@ -233,7 +233,7 @@
         </div>
     </div>
 
-    <div class="credito">Criado por Kauan</div>
+    <div class="credito">Criado Cauã</div>
 
     <script>
         function abrirDeclaracao() {
