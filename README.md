@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -31,14 +32,14 @@
         /* Container da Música no Topo */
         .music-container {
             position: absolute;
-            top: 20px;
+            top: 15px;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -46,17 +47,17 @@
 
         .music-container span {
             color: white;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
         }
 
         .player-wrapper {
             position: relative;
-            width: 180px;
-            height: 100px;
-            border-radius: 10px;
+            width: 160px;
+            height: 90px;
+            border-radius: 8px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.6);
         }
@@ -76,7 +77,7 @@
             align-items: center;
             width: 100%;
             height: 100%;
-            padding: 20px;
+            padding: 15px;
         }
 
         /* Tela Inicial / Botão de Entrada */
@@ -85,19 +86,19 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 40px 50px;
+            padding: 30px 40px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             transition: opacity 0.5s ease, transform 0.5s ease;
             position: absolute;
-            margin-top: 40px;
+            margin-top: 60px;
         }
 
         .welcome-container h1 {
             color: #ffffff;
-            font-size: 24px;
-            margin-bottom: 25px;
+            font-size: 22px;
+            margin-bottom: 20px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
         }
 
@@ -105,7 +106,7 @@
             background-color: #ffffff;
             color: #b30000;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 25px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 30px;
@@ -138,27 +139,27 @@
             transform: translate(-50%, -50%) scale(1.5);
         }
 
-        /* Caixa da mensagem centralizada */
+        /* Caixa da mensagem centralizada corrigida */
         .mensagem-container {
             position: absolute;
-            max-width: 650px;
-            width: 90%;
-            max-height: 70vh;
+            width: 88%;
+            max-width: 500px;
+            height: 62vh; /* Altura controlada para caber na tela do celular */
             overflow-y: auto;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.18);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 35px;
+            padding: 25px 20px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             color: #ffffff;
             text-align: left;
             opacity: 0;
             transform: translateY(30px) scale(0.95);
             pointer-events: none;
             transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
-            margin-top: 50px;
+            margin-top: 70px;
         }
 
         .mensagem-container.mostrar {
@@ -174,17 +175,18 @@
         }
 
         .mensagem-container::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         .mensagem-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
             border-radius: 10px;
         }
 
         .mensagem-container p {
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            word-wrap: break-word; /* Garante que as palavras quebrem direito */
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
         }
         .mensagem-container p:last-child {
@@ -193,10 +195,10 @@
         
         .credito {
             position: absolute;
-            bottom: 15px;
+            bottom: 10px;
             right: 15px;
             color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
             z-index: 5;
@@ -208,7 +210,6 @@
 
     <canvas id="canvas"></canvas>
 
-    <!-- Player do YouTube Direto e Livre -->
     <div class="music-container">
         <span>🎵 Música</span>
         <div class="player-wrapper">
@@ -217,16 +218,13 @@
     </div>
 
     <div class="center-wrapper">
-        <!-- Tela Inicial de Boas-Vindas -->
         <div class="welcome-container" id="welcomeBox">
             <h1>Olá, isso é para você</h1>
             <button class="welcome-btn" onclick="abrirDeclaracao()">Abrir Mensagem</button>
         </div>
 
-        <!-- Coração vermelho que aparece ao clicar -->
         <div class="heart-burst" id="heartBurst">❤</div>
 
-        <!-- Caixa da Declaração -->
         <div class="mensagem-container" id="mensagemBox">
             <p>Oi, sei que o tempo passou e que nossas vidas tomaram rumos diferentes, mas há algo que ficou guardado aqui e que eu precisava te dizer de verdade, com o coração aberto.</p>
             <p>Na época em que a gente tinha 15, 16 anos, eu já gostava muito de você. Você sempre foi uma garota incrível, linda de um jeito único e extremamente dedicada aos estudos — o que sempre me fez te admirar ainda mais. Quando tomei coragem e tentei me declarar para você lá atrás, as coisas não saíram como eu esperava e você acabou contando para a minha mãe. Naquele momento, confesso que fiquei muito chateado e para baixo, porque era um sentimento muito sincero da minha parte e eu não sabia lidar muito bem com a situação.</p>
@@ -235,7 +233,7 @@
         </div>
     </div>
 
-    <div class="credito">Criado Caua</div>
+    <div class="credito">Criado por Kauan</div>
 
     <script>
         function abrirDeclaracao() {
