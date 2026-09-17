@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Casa Escura — A Perseguição</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        body {
+            background: #000; color: #e0e0e0; min-height: 100vh; padding: 15px;
+            transition: all 0.25s;
+        }
+        .container { max-width: 100%; margin: 0 auto; }
+        #tela {
+            background: radial-gradient(ellipse at center, #120000 0%, #000 70%);
+            border: 2px solid #2b0000; border-radius: 12px; padding: 20px;
+            margin-bottom: 15px; min-height: 400px;
+            box-shadow: inset 0 0 60px rgba(90, 0, 0, 0.35), 0 0 25px rgba(60, 0, 0, 0.5);
+            position: relative; overflow: hidden;
+        }
+        .titulo {
+            color: #900; text-align: center; margin-bottom: 15px; font-size: 22px;
+            text-shadow: 0 0 20px #600, 0 0 40px #400; letter-spacing: 3px;
+            animation: pisca 4s infinite;
+        }
+        @keyframes pisca { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .texto { font-size: 16px; line-height: 1.9; margin-bottom: 20px; color: #ddd; }
+        .alerta { color: #f50; font-weight: bold; text-shadow: 0 0 8px #f00; margin: 10px 0; }
+        .pessoas {
+            background: rgba(40,0,0,0.4); border: 1px solid #400; border-radius: 8px;
+            padding: 10px; margin-bottom: 15px; font-size: 14px;
+        }
+        .vivo { color: #0f8; }
+        .morto { color: #f00; text-decoration: line-through; opacity: 0.6; }
+        .escolha {
+            display: block; width: 100%; background: linear-gradient(180deg, #1c0000, #0f0000);
+            color: #ff9999; border: 1px solid #400; padding: 15px; margin: 10px 0;
+            border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.25s;
+        }
+        .escolha:hover, .escolha:active {
+            background: #400; border-color: #f00; transform: scale(1.02);
+            box-shadow: 0 0 15px #600;
+        }
+        /* Efeitos */
+        .susto { animation: susto 0.18s ease-in-out; }
+        .tremer { animation: tremer 0.35s ease-in-out; }
+        .morte { animation: morte 0.6s ease-in-out forwards; }
+        .perigo { animation: alertaVermelho 0.8s infinite; }
+        @keyframes susto {
+            0%{background:#000} 50%{background:#900;box-shadow:inset 0 0 100px #f00}
+            100%{background:radial-gradient(ellipse at center,#120000 0%,#000 70%)}
+        }
+        @keyframes tremer {
+            0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)rotate(-1.5deg)}
+            50%{transform:translateX(10px)rotate(1.5deg)} 75%{transform:translateX(-6px)rotate(-0.8deg)}
+        }
+        @keyframes morte {
+            0%{filter:brightness(1)} 40%{filter:brightness(0)saturate(3)sepia(2)}
+            100%{filter:brightness(0.15)saturate(2)sepia(1)}
+        }
+        @keyframes alertaVermelho {
+            0%,100%{box-shadow:inset 0 0 30px rgba(120,0,0,0.4)}
+            50%{box-shadow:inset 0 0 50px rgba(200,0,0,0.7)}
+        }
+        /* Sanidade */
+        .barra-sanidade {
+            width: 100%; height: 12px; background: #1a0000; border-radius: 6px;
+            margin-bottom: 10px; overflow: hidden; border: 1px solid #300;
+        }
+        .nivel-sanidade {
+            height: 100%; background: linear-gradient(90deg, #c00, #f30, #f90);
+            width: 100%; transition: width 0.6s ease; border-radius: 6px;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .texto-sanidade {
+            text-align: center; font-size: 13px; margin-bottom: 5px;
+            color: #996666; letter-spacing: 1px;
+        }
+        .fim {
+            color: #f00; text-align: center; font-size: 22px; margin-top: 25px;
+            font-weight: bold; text-shadow: 0 0 15px #f00; animation: pisca 2.5s infinite;
+        }
+        #botaoReiniciar {
+            display: none; background: #500; margin-top: 20px;
+            border-color: #700;
+        }
+        /* Grão de filme */
+        .grao {
+            position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: moverGrao 1s steps(4) infinite;
+        }
+        @keyframes moverGrao { 0%{transform:translate(0,0)} 100%{transform:translate(5px,5px)} }
+        /* Monstro se aproximando */
+        .monstro-perto { border: 2px solid #f00; box-shadow: 0 0 20px #f00, inset 0 0 20px rgba(255,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="tela">
+            <div class="grao"></div>
+            <h1 class="titulo">🏚️ A PERSEGUIÇÃO</h1>
+            
+            <p class="texto-sanidade">🧠 Sanidade: <span id="valorSanidade">100</span>% &nbsp;|&nbsp; 👣 O Monstro está: <span id="statusMonstro">Procurando</span></p>
+            <div class="barra-sanidade"><div id="nivelSanidade" class="nivel-sanidade"></div></div>
+            
+            <div class="pessoas">
+                <strong>👥 Sobreviventes:</strong><br>
+                <span id="p1" class="vivo">🔴 Lucas — Jovem, corre rápido</span><br>
+                <span id="p2" class="vivo">🔵 Ana — Sabe coisas sobre a área</span><br>
+                <span id="p3" class="vivo">🟢 Marcos — Tem força para quebrar coisas</span><br>
+                <span id="p4" class="vivo">🟡 Júlia — Encontra passagens secretas</span>
+            </div>
+
+            <div id="textoHistoria" class="texto"></div>
+            <div id="caixaEscolhas"></div>
+            <button id="botaoReiniciar" class="escolha" onclick="reiniciar()">🔄 Recomeçar — Ninguém sobreviveu</button>
+        </div>
+    </div>
+
+    <script>
+        // Sons
+        const som = {
+            susto: () => { try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(100,a.currentTime);o.frequency.exponentialRampToValueAtTime(350,a.currentTime+0.12);g.gain.setValueAtTime(0.5,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.35);o.start(a.currentTime);o.stop(a.currentTime+0.35)}catch(e){}},
+            passo: () => { try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.type='triangle';o.connect(g);g.connect(a.destination);o.frequency.setValueAtTime(45,a.currentTime);g.gain.setValueAtTime(0.2,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.15);o.start(a.currentTime);o.stop(a.currentTime+0.15)}catch(e){}},
+            grito: () => { try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.type='sawtooth';o.connect(g);g.connect(a.destination);o.frequency.setValueAtTime(200,a.currentTime);o.frequency.exponentialRampToValueAtTime(80,a.currentTime+0.4);g.gain.setValueAtTime(0.4,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.4);o.start(a.currentTime);o.stop(a.currentTime+0.4)}catch(e){}},
+            porta: () => { try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.type='square';o.connect(g);g.connect(a.destination);o.frequency.setValueAtTime(55,a.currentTime);g.gain.setValueAtTime(0.3,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.1);o.start(a.currentTime);o.stop(a.currentTime+0.1)}catch(e){}},
+            coracao: () => { try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.type='sine';o.connect(g);g.connect(a.destination);o.frequency.setValueAtTime(85,a.currentTime);g.gain.setValueAtTime(0.12,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.2);o.start(a.currentTime);o.stop(a.currentTime+0.2)}catch(e){}}
+        };
+
+        // ESTADO DO JOGO
+        let sanidade = 100;
+        let cenaAtual = "inicio";
+        let monstroPerto = false;
+        let monstroDistancia = 3; // 3=longe, 2=chegando, 1=muito perto, 0=pegou
+        let pessoas = {
+            lucas: true,
+            ana: true,
+            marcos: true,
+            julia: true
+        };
+        let casaAtual = 1; // 1, 2 ou 3
+        let itens = { chave: false, machado: false, mapa: false, lanterna: false };
+
+        // ATUALIZAR INTERFACE
+        function atualizarInterface() {
+            // Sanidade
+            const el = document.getElementById('nivelSanidade');
+            const val = document.getElementById('valorSanidade');
+            sanidade = Math.max(0, Math.min(100, sanidade));
+            el.style.width = sanidade + '%';
+            val.textContent = sanidade;
+
+            // Monstro
+            const status = document.getElementById('statusMonstro');
+            const tela = document.getElementById('tela');
+            tela.classList.remove('monstro-perto', 'perigo');
+            if (monstroDistancia === 3) {
+                status.textContent = 'Longe 🌑'; status.style.color = '#0f8';
+            } else if (monstroDistancia === 2) {
+                status.textContent = 'Chegando... ⚠️'; status.style.color = '#fa0';
+            } else if (monstroDistancia === 1) {
+                status.textContent = 'MUITO PERTO! 🔴'; status.style.color = '#f00';
+                tela.classList.add('monstro-perto', 'perigo');
+            } else {
+                status.textContent = 'TE ENCONTROU 💀'; status.style.color = '#f00';
+            }
+
+            // Pessoas
+            document.getElementById('p1').className = pessoas.lucas ? 'vivo' : 'morto';
+            document.getElementById('p1').innerHTML = pessoas.lucas ? '🔴 Lucas — Jovem, corre rápido' : '🔴 Lucas — Devorado';
+            document.getElementById('p2').className = pessoas.ana ? 'vivo' : 'morto';
+            document.getElementById('p2').innerHTML = pessoas.ana ? '🔵 Ana — Sabe coisas sobre a área' : '🔵 Ana — Arrastada';
+            document.getElementById('p3').className = pessoas.marcos ? 'vivo' : 'morto';
+            document.getElementById('p3').innerHTML = pessoas.marcos ? '🟢 Marcos — Tem força para quebrar coisas' : '🟢 Marcos — Morto em combate';
+            document.getElementById('p4').className = pessoas.julia ? 'vivo' : 'morto';
+            document.getElementById('p4').innerHTML = pessoas.julia ? '🟡 Júlia — Encontra passagens secretas' : '🟡 Júlia — Desapareceu';
+        }
+
+        function tocarSom(nome) { if (som[nome]) som[nome](); }
+        function avancarMonstro() { if (monstroDistancia > 0) monstroDistancia--; }
+        function recuarMonstro() { monstroDistancia = Math.min(3, monstroDistancia + 1); }
+        function matarPessoa(nome) { pessoas[nome] = false; }
+        function quantosVivos() { return Object.values(pessoas).filter(v => v).length; }
+
+        // CENAS — 3 CASAS, 1 MONSTRO, 4 PESSOAS
+        const cenas = {
+            inicio: {
+                texto: "Vocês estavam acampando na floresta. O som — um GRITO. Depois, o silêncio. E os passos. PESADOS. Lentos. Não são humanos. A criatura surgiu das sombras. Todos correram. Agora estão separados. Você chega à PRIMEIRA CASA — uma cabana velha e escura. Os passos vêm atrás. Cada vez mais perto.",
+                opcoes: [
+                    { texto: "🚪 Entrar na Casa 1 e procurar os outros", proxima: "casa1_entrada" },
+                    { texto: "🏃 Continuar correndo — não parar", proxima: "fuga_direta" },
+                    { texto: "🗺️ Subir em uma árvore e observar quem chega", proxima: "observar" }
+                ]
+            },
+            fuga_direta: {
+                texto: "Você corre sem olhar. Os passos aceleram. A coisa SABE onde você está. Não adianta correr — ela corre MAIS RÁPIDO.",
+                sanidade: -5,
+                monstroAvan: true,
+                opcoes: [
+                    { texto: "🚪 Entrar na Casa 1 — é a única opção", proxima: "casa1_entrada" }
+                ]
+            },
+            observar: {
+                texto: "Escondido nas folhas, vê a criatura passar. ALTA, magra, pele cinza, sem rosto — só uma boca vertical cheia de dentes. Ela para. Olha para onde VOCÊ está. E sorri. Sobe a árvore.",
+                sanidade: -20,
+                susto: true, som: "susto", monstroAvan: true,
+                opcoes: [
+                    { texto: "🪵 Pular e correr para a Casa 1", proxima: "casa1_entrada" }
+                ]
+            },
+
+            // === CASA 1 — A CABANA VELHA ===
+            casa1_entrada: {
+                texto: "Cabana escura, cheia de pó. A porta range ao fechar. Há alguém gemendo no canto. É LUCAS. Ele está ferido. 'Me ajuda... por favor, não me deixa aqui...' Os passos param DO LADO DE FORA. A coisa está esperando.",
+                casa: 1,
+                opcoes: [
+                    { texto: "🤍 Ajudar Lucas — ele pode ajudar você depois", proxima: "casa1_ajuda_lucas" },
+                    { texto: "🚶 Esconder-se e deixá-lo — ele vai atrair a criatura", proxima: "casa1_abandona_lucas" },
+                    { texto: "🔍 Procurar uma saída secreta primeiro", proxima: "casa1_procura_saida" }
+                ]
+            },
+            casa1_ajuda_lucas: {
+                texto: "Você amarra o ferimento de Lucas. Ele respira aliviado: 'Obrigado. Eu vi a Ana e os outros correndo para a CASA 2, do outro lado do riacho. Se formos rápido, podemos alcançá-los.'",
+                casa: 1,
+                acao: () => { pessoas.lucas = true; itens.lanterna = true; },
+                opcoes: [
+                    { texto: "🏃 Sair pelos fundos em direção à Casa 2", proxima: "casa1_fuga_casa2" },
+                    { texto: "🔍 Procurar armas antes de ir", proxima: "casa1_armas" }
+                ]
+            },
+            casa1_abandona_lucas: {
+                texto: "Você se esconde no armário. Lucas chama, chora, grita. A porta é ARRANCADA das dobradiças. O grito dele dura segundos. Depois, silêncio. A criatura não foi embora. Está cheirando o ar. Sabe que tem mais alguém.",
+                sanidade: -25,
+                acao: () => { pessoas.lucas = false; },
+                monstroAvan: true, susto: true, som: "grito",
+                opcoes: [
+                    { texto: "🏃 Correr para fora — a Casa 2 é próxima", proxima: "casa1_fuga_casa2" },
+                    { texto: "🔑 Ficar escondido e esperar passar", proxima: "esconde_e_espera" }
+                ]
+            },
+            casa1_procura_saida: {
+                texto: "Encontra uma passagem estreita atrás de um armário. Mas Lucas grita — a porta está abrindo. Você tem que escolher: ele ou a fuga.",
+                casa: 1,
+                opcoes: [
+                    { texto: "🚶 Fugir pela passagem sozinho", proxima: "casa1_fuga_casa2" },
+                    { texto: "🤍 Pegar Lucas e ir os dois — é mais lento", proxima: "casa1_ajuda_lucas" }
+                ]
+            },
+            casa1_armas: {
+                texto: "Encontra uma lanterna e um pedaço de madeira pesado. Lucas pega a lanterna. 'Isso não vai parar aquilo... mas pode assustar.'",
+                acao: () => { itens.lanterna = true; },
+                opcoes: [
+                    { texto: "🏃 Agora sim — ir para a Casa 2", proxima: "casa1_fuga_casa2" }
+                ]
+            },
+            casa1_fuga_casa2: {
+                texto: "Vocês saem pelos fundos. Atrás, o som de madeira quebrando — a criatura está destruindo a cabana. Correm pela floresta escura. A CASA 2 aparece à frente: maior, de pedra, com janelas gradeadas. Parece mais segura.",
+                som: "passo",
+                opcoes: [
+                    { texto: "🚪 Entrar na Casa 2 — A Mansão de Pedra", proxima: "casa2_entrada" }
+                ]
+            },
+            esconde_e_espera: {
+                texto: "Os passos se aproximam. Param ao lado do armário. Você segura a respiração. Uma garra perfura a madeira ao lado do seu rosto. Ela SABE. Arranca a porta.",
+                sanidade: -30,
+                susto: true, tremer: true, monstroAvan: true,
+                fim: true,
+                resultado: "💀 Não há esconderijo que funcione para sempre. Ela te encontrou."
+            },
+
+            // === CASA 2 — A MANSÃO DE PEDRA ===
+            casa2_entrada: {
+                texto: "Pedra fria e grossa. Porta de carvalho maciço. Trancam com ferrolho. Dentro, ao pé da escada, ANA e MARCOS. Eles estão examinando uma marca no chão. 'Vocês conseguiram! — diz Ana. Júlia foi para a CASA 3 — a igreja antiga. Diz que tem uma passagem subterrânea que sai da floresta.'",
+                casa: 2,
+                acao: () => { casaAtual = 2; },
+                opcoes: [
+                    { texto: "📖 Ouvir o plano de Ana", proxima: "casa2_plano_ana" },
+                    { texto: "🪜 Subir e procurar Júlia primeiro", proxima: "casa2_procura_julia" },
+                    { texto: "🛡️ Barricar a porta com a ajuda de Marcos", proxima: "casa2_barricada" }
+                ]
+            },
+            casa2_plano_ana: {
+                texto: "'A criatura... não é invencível. É cega, mas tem audição perfeita. E não entra em lugares onde há símbolos antigos. A Casa 3 é o ponto mais forte. Mas precisamos ir todos juntos.'",
+                casa: 2,
+                opcoes: [
+                    { texto: "🤍 Ir todos juntos para a Casa 3", proxima: "casa2_sai_juntos" },
+                    { texto: "🔫 Marcos e Lucas ficam na defesa, você e Ana vão à Casa 3", proxima: "casa2_divide_grupo" },
+                    { texto: "🔒 Ficar aqui — trancados — esperar o dia", proxima: "casa2_fica_trancado" }
+                ]
+            },
+            casa2_barricada: {
+                texto: "Vocês empurram um aparador de pedra para a porta. Marcos suda: 'Isso segura... por enquanto.' Mas do lado de fora — o som de algo batendo. FORTE. A porta treme a cada impacto. A pedra racha.",
+                sanidade: -10,
+                tremer: true, som: "porta", monstroAvan: true,
+                opcoes: [
+                    { texto: "🏃 Pela escada — Casa 3 antes que a porta caia!", proxima: "casa2_sai_juntos" },
+                    { texto: "⚔️ Esperar ela entrar — lutar com Marcos", proxima: "luta_morte" }
+                ]
+            },
+            casa2_procura_julia: {
+                texto: "Você sobe. Andar superior — silêncio. Um quarto tem janela aberta e um mapa rabiscado. Júlia esteve aqui. No papel, uma rota secreta entre a Casa 2 e a Casa 3. Mas lá embaixo — GRITOS. A porta cedeu.",
+                sanidade: -15,
+                acao: () => { itens.mapa = true; },
+                susto: true, som: "grito", monstroAvan: true,
+                opcoes: [
+                    { texto: "🗺️ Pegar o mapa e pular pela janela em direção à Casa 3", proxima: "casa3_entrada" },
+                    { texto: "🏃 Descer para ajudar os outros", proxima: "ajuda_tarde" }
+                ]
+            },
+            ajuda_tarde: {
+                texto: "Desce correndo. A porta está no chão. Marcos está no chão, imóvel. Ana foi arrastada para fora. A criatura vira para você. Sangue escuro escorre de suas garras.",
+                sanidade: -30,
+                acao: () => { pessoas.ana = false; pessoas.marcos = false; },
+                susto: true, tremer: true, som: "grito", monstroAvan: true,
+                opcoes: [
+                    { texto: "🏃 Correr — só existe a Casa 3 agora", proxima: "casa3_entrada" }
+                ]
+            },
+            casa2_sai_juntos: {
+                texto: "Vocês saem pelos fundos. O caminho é perigoso, mas estão todos juntos. Ana guia pelo atalho. Atrás, os passos — mais rápidos agora. Ela sabe que vocês estão fugindo.",
+                casa: 2,
+                opcoes: [
+                    { texto: "🚪 Chegar à Casa 3 — A Igreja Abandonada", proxima: "casa3_entrada" }
+                ]
+            },
+            casa2_divide_grupo: {
+                texto: "'Não! — grita Ana — Se separarem, ela caça um por um!' Marcos insiste: 'Eu seguro. Vocês vão.' Você e Ana partem. Minutos depois — um grito. Depois outro. Ela os pegou. Mais rápido do que pensavam.",
+                sanidade: -25,
+                acao: () => { pessoas.lucas = false; pessoas.marcos = false; },
+                som: "grito", monstroAvan: true,
+                opcoes: [
+                    { texto: "🏃 Correr com Ana para a Casa 3", proxima: "casa3_entrada" }
+                ]
+            },
+            casa2_fica_trancado: {
+                texto: "A porta caiu. A barricada não segurou. A criatura entra devagar. Não tem pressa. Vocês estão presos. Marcos tenta atacar — é partido ao meio em um instante. Não há escapatória aqui.",
+                sanidade: -40,
+                acao: () => { pessoas.lucas = false; pessoas.ana = false; pessoas.marcos = false; },
+                susto: true, tremer: true, som: "grito", monstroAvan: true,
+                fim: true,
+                resultado: "💀 Ficar parado era o pior erro possível. Ela entrou. E caçou vocês um por um."
+            },
+            luta_morte: {
+                texto: "Vocês avançam. Uma garra arranca o peito de Marcos. Ele cai sem som. Você ataca — inútil. A criatura te agarra com uma mão só. Levanta você no ar. Seus pés não tocam o chão. Ela observa, sem rosto. E aperta.",
+                sanidade: -50,
+                acao: () => { pessoas.marcos = false; },
+                susto: true, tremer: true, som: "grito", monstroAvan: true,
+                fim: true,
+                resultado: "⚔️ Coragem não vence o impossível. Vocês lutaram até o fim."
+            },
+
+            // === CASA 3 — A IGREJA ABANDONADA ===
+            casa3_entrada: {
+                texto: "Uma igreja antiga, de pedra escura. Cruzes quebradas no chão. JÚLIA está ali, acendendo velas em um altar cheio de símbolos. 'Chegaram! Rápido — a porta não vai segurar. Os símbolos... eles a assustam. Mas só enquanto as velas estiverem acesas.'",
+                casa: 3,
+                acao: () => { casaAtual = 3; },
+                opcoes: [
+                    { texto: "🕯️ Ajudar Júlia a acender todos os símbolos", proxima: "casa3_ritual" },
+                    { texto: "🚪 Trancar a porta e procurar a passagem secreta", proxima: "casa3_passagem" },
+                    { texto: "⚔️ Preparar armadilhas com os que restaram", proxima: "casa3_armadilhas" }
+                ]
+            },
+            casa3_ritual: {
+                texto: "Vocês acendem cada vela. A luz amarela tremula contra a escuridão. Do lado de fora — um rugido. A coisa não entra. Mas bate na porta, nas paredes, no chão. As velas começam a apagar uma por uma com o vento que ela gera.",
+                sanidade: -10,
+                tremer: true, som: "porta",
+                opcoes: [
+                    { texto: "🗝️ Júlia — a passagem! Agora ou nunca!", proxima: "casa3_passagem" },
+                    { texto: "🔥 Proteger as velas com o corpo — ganhar tempo", proxima: "casa3_defender_velas" }
+                ]
+            },
+            casa3_passagem: {
+                texto: "Júlia levanta uma laje no altar — uma escada para o subsolo escuro. 'É a saída! Mas é estreita — um de cada vez. E se ela chegar antes do último...'",
+                casa: 3,
+                opcoes: [
+                    { texto: "👥 Descer todos — ordem: os feridos primeiro", proxima: "final_todos_vivos" },
+                    { texto: "🏃 Você desce primeiro — verificar se é seguro", proxima: "final_voce_escapa" },
+                    { texto: "🛡️ Quem está bem fica para segurar a laje", proxima: "final_ultimo_fica" }
+                ]
+            },
+            casa3_armadilhas: {
+                texto: "Vocês empilham bancos, quebram grades. Mas a criatura não é humana — não cai em armadilhas. A parede da entrada RACHA. Uma mão enorme abre caminho através da pedra. Ela entra. Não existe barreira para ela.",
+                sanidade: -30,
+                susto: true, tremer: true, monstroAvan: true, som: "grito",
+                opcoes: [
+                    { texto: "🕯️ Correr para o altar — os símbolos são a única esperança", proxima: "casa3_ritual" }
+                ]
+            },
+            casa3_defender_velas: {
+                texto: "Vocês cercam as velas, protegendo do vento. A porta cai. A criatura entra — mas para. A luz a queima. Ela GRITA, um som que dói nos ouvidos. Recua um passo. Mas uma vela apaga. Depois outra. A luz está acabando. 'CORRAM!' — grita Júlia.",
+                sanidade: -15,
+                susto: true, som: "grito",
+                opcoes: [
+                    { texto: "⬇️ Pular para a passagem — AGORA!", proxima: "casa3_passagem" }
+                ]
+            },
+
+            // === FINAIS ===
+            final_todos_vivos: {
+                texto: "Todos descem. Júlia é a última — fecha a laje segundos antes da garra bater. O túnel é longo, escuro, úmido. Caminham por uma hora. Até verem a LUZ DO SOL no fim. Estão fora da floresta. Atrás, apenas silêncio.",
+                sanidade: +20,
+                fim: true,
+                resultado: `🎉🏆 FINAL: A FUGA PERFEITA — ${quantosVivos()} de 4 sobreviveram! Vocês saíram juntos, se protegeram e venceram a perseguição. A criatura ficou presa na escuridão da igreja. Vocês nunca mais voltaram.`,
+                vitoria: true
+            },
+            final_voce_escapa: {
+                texto: "Você desce primeiro. Chega ao fim — é a saída! Mas olha para trás — ninguém veio. O som de luta lá em cima parou. Silêncio. Você está vivo. Mas está sozinho. E a sensação de que algo te segue não some nunca mais.",
+                sanidade: -10,
+                fim: true,
+                resultado: "🏃 FINAL: SOBREVIVENTE SOLITÁRIO — Você escapou. Mas deixou os outros para trás. A culpa te persegue mais do que a criatura. Você nunca foi o mesmo depois daquela noite."
+            },
+            final_ultimo_fica: {
+                texto: "Todos desceram. Você segura a laje até o último segundo — e a fecha. Fica sozinho na igreja escura. Os passos se aproximam. Você corre para outra saída dos fundos — consegue escapar por pouco. Reencontra os outros ao amanhecer.",
+                sanidade: +5,
+                fim: true,
+                resultado: `🤝 FINAL: O HERÓI — ${quantosVivos()} sobreviveram. Você foi o último, arriscou tudo e saiu vivo. Os outros te devem a vida. Mas aqueles olhos sem rosto vão te visitar em sonhos para sempre.`,
+                vitoria: true
+            },
+            fim_sanidade: {
+                texto: "O terror foi demais. Você cai de joelhos, rindo e chorando ao mesmo tempo. A criatura se aproxima devagar. Não precisa correr. Você já não consegue se mover.",
+                fim: true,
+                resultado: "😵 SANIDADE ZERADA — Sua mente quebrou antes do corpo."
+            }
+        };
+
+        let cenaIniciada = false;
+        function carregarCena(nomeCena) {
+            if (!cenaIniciada) { cenaIniciada = true; cenaAtual = nomeCena; }
+            const cena = cenas[nomeCena];
+            cenaAtual = nomeCena;
+
+            // Atualizar distância do monstro
+            if (cena.monstroAvan) avancarMonstro();
+            if (cena.monstroRecua) recuarMonstro();
+
+            // Atualizar sanidade
+            if (cena.sanidade !== undefined) sanidade += cena.sanidade;
+            atualizarInterface();
+
+            // Checar se o monstro pegou você
+            if (monstroDistancia <= 0 && !cena.fim) {
+                cenaAtual = "fim_sanidade";
+                return carregarCena("fim_sanidade");
+            }
+
+            // Executar ação da cena
+            if (cena.acao) cena.acao();
+
+            // Elementos da tela
+            const tela = document.getElementById("tela");
+            const texto = document.getElementById("textoHistoria");
+            const escolhas = document.getElementById("caixaEscolhas");
+            const botaoReiniciar = document.getElementById("botaoReiniciar");
+
+            // Reset efeitos
+            tela.classList.remove("susto", "tremer", "morte");
+            if (cena.susto) { tela.classList.add("susto"); setTimeout(()=>tela.classList.remove("susto"), 180); }
+            if (cena.tremer) { tela.classList.add("tremer"); setTimeout(()=>tela.classList.remove("tremer"), 350); }
+            if (cena.som) tocarSom(cena.som);
+
+            // Conteúdo
+            texto.innerHTML = cena.texto;
+            escolhas.innerHTML = "";
+
+            // Fim de jogo
+            if (cena.fim) {
+                tela.classList.add(cena.vitoria ? "" : "morte");
+                texto.innerHTML += `<div class="fim">${cena.resultado}</div>`;
+                botaoReiniciar.style.display = "block";
+                return;
+            }
+
+            // Botões de escolha
+            cena.opcoes.forEach(op => {
+                const btn = document.createElement("button");
+                btn.className = "escolha";
+                btn.textContent = op.texto;
+                btn.onclick = () => carregarCena(op.proxima);
+                escolhas.appendChild(btn);
+            });
+            botaoReiniciar.style.display = "none";
+        }
+
+        function reiniciar() {
+            sanidade = 100;
+            monstroDistancia = 3;
+            casaAtual = 1;
+            pessoas = { lucas: true, ana: true, marcos: true, julia: true };
+            itens = { chave: false, machado: false, mapa: false, lanterna: false };
+            cenaAtual = "inicio";
+            cenaIniciada = false;
+            document.getElementById("tela").classList.remove("morte", "perigo", "monstro-perto");
+            carregarCena("inicio");
+        }
+
+        window.onload = () => carregarCena("inicio");
+    </script>
+</body>
+</html>
+
